@@ -1,30 +1,29 @@
-// main.js
-
+require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
-const { OpenAIAPI } = require('openai-api');
+const axios = require('axios');
+const { OpenAI } = require('openai');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-// OpenAI API setup
-const openai = new OpenAIAPI({ apiKey: 'your_openai_api_key' });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-// Endpoint to receive messages from Flutter
 app.post('/send-message', async (req, res) => {
   try {
-    const userMessage = req.body.message;
+    const { message } = req.body;
 
-    // Send user message to ChatGPT and get response
-    const chatGptResponse = await openai.complete({
-      prompt: userMessage,
-      max_tokens: 150,
+    const chatCompletion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ "role": "user", "content": message }],
     });
 
-    // Send the response back to Flutter
-    res.json({ response: chatGptResponse.choices[0].text.trim() });
+    console.log(chatCompletion.choices[0].message);
+
+    res.json({ response: chatCompletion.choices[0].message.content });
   } catch (error) {
     console.error('Error handling request:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
