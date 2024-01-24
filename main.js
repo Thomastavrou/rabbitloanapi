@@ -3,13 +3,14 @@ const express = require('express');
 const axios = require('axios');
 const { OpenAI } = require('openai');
 
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
-
+app.use(cors());
 app.use(express.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: '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',
 });
 
 app.post('/send-message', async (req, res) => {
