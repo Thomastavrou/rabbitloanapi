@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64 Image Fetcher</title>
+</head>
+<body>
+  <h1>Base64 Image Fetcher</h1>
+
+  <script>
+    // Replace 'https://www.zaapyapp.com/images/logo_with_name_dark.png' with the actual URL of your image file
+    const imageUrl = 'https://www.zaapyapp.com/images/logo_with_name_dark.png';
+
+    // Fetch the image using fetch API
+    fetch(imageUrl)
+      .then(response => response.arrayBuffer())
+      .then(buffer => {
+        // Convert the image buffer to base64
+        const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+
+        // Print the base64 string
+        console.log('data:image/png;base64,' + base64String);
+      })
+      .catch(error => {
+        console.error('Error fetching image:', error.message);
+      });
+  </script>
+</body>
+</html>
