@@ -1,6 +1,6 @@
 // config.js
 module.exports = {
   firebaseServiceAccountPath: './rabbitloan-app-firebase-adminsdk-439mr-fdaa7bf1ce.json',
-  openaiApiKey: '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',
+  openaiApiKey: 'need new key',
   firebaseStorageBucket: 'rabbitloan-app.appspot.com',
 };
