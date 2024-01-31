@@ -2,8 +2,9 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const openaiRoutes = require('./routes/openaiRoutes.js');
+// const openaiRoutes = require('./routes/openaiRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
+const imageRoutes = require('./routes/imageRoutes.js');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -49,6 +50,7 @@ const bucket = admin.storage().bucket();
 
 // Pass the initialized services and the config object to userRoutes
 app.use('/user', userRoutes({ db, auth, bucket }));
+app.use('/images', imageRoutes({ bucket }));
 
 // Other routes
 // app.use('/openai', openaiRoutes);
