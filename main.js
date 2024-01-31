@@ -4,7 +4,7 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 // const openaiRoutes = require('./routes/openaiRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
-const imageRoutes = require('./routes/imageRoutes.js');
+const imageRoutes = require('./routes/imageRoute.js');
 
 // Load environment variables from .env file
 require('dotenv').config();
