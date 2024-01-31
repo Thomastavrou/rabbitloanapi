@@ -1,8 +1,7 @@
-// main.js
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-// const openaiRoutes = require('./routes/openaiRoutes.js');
+const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes.js');
 const imageRoutes = require('./routes/imageRoute.js');
 
@@ -14,6 +13,7 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+app.use(bodyParser.json({ limit: '10mb' })); // Set the payload size limit
 app.use(express.json());
 
 // Firebase Initialization
@@ -34,8 +34,6 @@ try {
     }),
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   };
-
-  
 
   admin.initializeApp(firebaseConfig);
 } catch (error) {
