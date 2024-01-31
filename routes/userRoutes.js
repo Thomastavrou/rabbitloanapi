@@ -1,12 +1,16 @@
 const express = require('express');
 
-module.exports = ({ db, auth, bucket, config }) => {
+module.exports = ({ db, auth, bucket }) => {
   const router = express.Router();
 
   router.post('/register', async (req, res) => {
     try {
       const { name, surname, email, phone, password, selfieBase64 } = req.body;
 
+      // Input validation (you can expand this based on your requirements)
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+      }
 
       // Decode base64 image to buffer
       const selfieBuffer = Buffer.from(selfieBase64, 'base64');
@@ -14,7 +18,7 @@ module.exports = ({ db, auth, bucket, config }) => {
       // Generate a unique filename for the image
       const fileName = `${Date.now()}_${Math.floor(Math.random() * 100000)}.png`;
 
-      // Upload the image to Firebase Storage
+      // Upload the image to Firebase Storage without creating a specific folder
       const file = bucket.file(fileName);
       await file.save(selfieBuffer, { contentType: 'image/png' });
 
@@ -32,21 +36,18 @@ module.exports = ({ db, auth, bucket, config }) => {
         surname: surname || '',
         email: email || '',
         phone: phone || '', // Change the key to match your JSON data
-        profileImageUrl: `gs://${config.firebaseStorageBucket}/${fileName}`,
+        profileImageUrl: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/${fileName}`,
       };
-           
 
+      // Create a new document in the 'users' collection with user details
       await db.collection('users').doc(userCredential.uid).set(newUser);
 
       res.json({ message: 'Registration successful', user: newUser });
     } catch (error) {
       console.error('Error during registration:', error.message);
 
-      if (error.code === 'auth/email-already-exists') {
-        res.status(400).json({ error: 'Email already in use' });
-      } else {
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
+      // Provide more detailed error information in the response
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
 
