@@ -20,7 +20,8 @@ module.exports = ({ db, auth, bucket }) => {
 
       // Upload the image to Firebase Storage without creating a specific folder
       const file = bucket.file(fileName);
-      await file.save(selfieBuffer, { contentType: 'image/png' });
+      await file.save(selfieBuffer, { contentType: 'image/jpeg' });
+
 
       // Create a new user in Firebase Authentication
       const userCredential = await auth.createUser({
