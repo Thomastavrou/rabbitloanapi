@@ -16,7 +16,7 @@ module.exports = ({ db, auth, bucket }) => {
       const selfieBuffer = Buffer.from(selfieBase64, 'base64');
 
       // Generate a unique filename for the image
-      const fileName = `${Date.now()}_${Math.floor(Math.random() * 100000)}.png`;
+      const fileName = `${Date.now()}_${Math.floor(Math.random() * 100000)}.jpeg`;
 
       // Upload the image to Firebase Storage without creating a specific folder
       const file = bucket.file(fileName);
