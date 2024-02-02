@@ -6,12 +6,10 @@ module.exports = ({ db, auth, bucket }) => {
   router.post('/register', async (req, res) => {
     try {
       const { name, surname, email, phone, password, selfieBase64 } = req.body;
-
       // Input validation (you can expand this based on your requirements)
       if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
       }
-
       // Decode base64 image to buffer
       const selfieBuffer = Buffer.from(selfieBase64, 'base64');
 
@@ -21,7 +19,6 @@ module.exports = ({ db, auth, bucket }) => {
       // Upload the image to Firebase Storage without creating a specific folder
       const file = bucket.file(fileName);
       await file.save(selfieBuffer, { contentType: 'image/jpeg' });
-
 
       // Create a new user in Firebase Authentication
       const userCredential = await auth.createUser({

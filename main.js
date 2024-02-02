@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes.js');
 const imageRoutes = require('./routes/imageRoute.js');
+const lendingRoutes = require('./routes/lendingRoutes.js');  
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -49,10 +50,10 @@ const bucket = admin.storage().bucket();
 // Pass the initialized services and the config object to userRoutes
 app.use('/user', userRoutes({ db, auth, bucket }));
 app.use('/images', imageRoutes({ bucket }));
+app.use('/lending', lendingRoutes({ db, auth }));  // Use the lendingRoutes for the /lending endpoint
 
 // Other routes
 // app.use('/openai', openaiRoutes);
-
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
