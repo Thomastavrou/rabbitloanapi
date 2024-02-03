@@ -133,6 +133,7 @@ router.get('/lending-products', async (req, res) => {
   }
 });
 
+
 // Helper function to handle errors and send a consistent response
 const handleError = (res, error, message) => {
   console.error(`${message}: ${error.message}`);
