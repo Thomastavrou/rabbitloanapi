@@ -6,36 +6,47 @@ module.exports = ({ db, auth }) => {
     const router = express.Router();
   
     // Endpoint to create a lending product
-    router.post('/lending-request', async (req, res) => {
+    router.post('/loan-request', async (req, res) => {
       try {
-        // Your logic to create a lending product here
-  
-        res.json({ message: 'Lending product created successfully' });
+        const { productId, amount } = req.body;
+    
+        // Validate request body
+        if (!productId || !amount) {
+          return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+        }
+    
+        // Placeholder for user authentication logic (replace with your actual logic)
+        const userId = 'K9jm19pUFdMDnS16uArUxweqqd73'; // Replace with your actual user ID retrieval logic
+    
+        // Ensure the user is authenticated
+        if (!userId) {
+          return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
+        }
+    
+        // Get the current date and time
+        const currentDate = new Date();
+    
+        // Your logic to handle the loan request goes here
+        // Store the loan request in a 'LoanRequests' collection
+        const loanRequestsCollection = db.collection('LoanRequests');
+    
+        const loanRequestData = {
+          userId,
+          productId,
+          amount,
+          date: currentDate,
+          // Additional fields if needed
+        };
+    
+        const newLoanRequestRef = await loanRequestsCollection.add(loanRequestData);
+    
+        res.json({ message: 'Loan request processed successfully', loanRequestId: newLoanRequestRef.id });
       } catch (error) {
-        console.error('Error during lending product creation:', error.message);
+        console.error('Error during loan request processing:', error.message);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
       }
     });
-  
-    // Endpoint to get all lending products
-    router.get('/lending-products', async (req, res) => {
-      try {
-        // Retrieve all lending products from the 'LendingProducts' collection
-        const lendingProductsCollection = db.collection('LendingProducts');
-        const snapshot = await lendingProductsCollection.get();
-  
-        // Extract data from the snapshot
-        const products = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-  
-        res.json({ message: 'Lending products retrieved successfully', products });
-      } catch (error) {
-        console.error('Error during lending product retrieval:', error.message);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
-      }
-    });
+    
   
     // Endpoint to create a lending product (additional route)
     router.post('/create-product', async (req, res) => {
