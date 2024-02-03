@@ -58,6 +58,48 @@ router.post('/loan-request', async (req, res) => {
   }
 });
 
+// Endpoint to process loan request status
+router.put('/loan-status/:loanRequestId', async (req, res) => {
+  try {
+    const { loanRequestId } = req.params;
+    const { status, reason } = req.body;
+
+    // Validate request body
+    if (!loanRequestId || !status) {
+      return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+    }
+
+    // Your authentication or authorization logic goes here if needed
+
+    // Get the 'LoanRequests' collection
+    const loanRequestsCollection = db.collection('LoanRequests');
+
+    // Retrieve the specific loan request
+    const loanRequestDoc = await loanRequestsCollection.doc(loanRequestId).get();
+
+    if (!loanRequestDoc.exists) {
+      return res.status(404).json({ error: 'Not Found', details: 'Loan request not found' });
+    }
+
+    // Update the status based on the provided decision
+    const updatedStatus = status.toLowerCase(); // Ensure lowercase for consistency
+
+    if (updatedStatus === 'accepted' || updatedStatus === 'rejected') {
+      // Update the status field
+      await loanRequestsCollection.doc(loanRequestId).update({ status: updatedStatus, reason });
+
+      // Respond with the updated status
+      res.json({ loanRequestId, status: updatedStatus, reason });
+    } else {
+      // Invalid status provided
+      res.status(400).json({ error: 'Bad Request', details: 'Invalid status provided' });
+    }
+  } catch (error) {
+    console.error('Error during loan request status update:', error.message);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
     
   
     // Endpoint to create a lending product (additional route)
