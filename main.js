@@ -10,7 +10,7 @@ const lendingRoutes = require('./routes/lendingRoutes.js');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
