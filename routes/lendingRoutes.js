@@ -27,7 +27,7 @@ const checkExistingLoanRequest = async (req, res, next) => {
   next();
 };
 
-// Endpoint to create a loan request
+// Create a loan request
 router.post('/loan-request', authenticateUser, checkExistingLoanRequest, async (req, res) => {
   try {
     const { userId, productId, amount } = req.body;
@@ -46,20 +46,17 @@ router.post('/loan-request', authenticateUser, checkExistingLoanRequest, async (
 
     res.json({ message: 'Loan request processed successfully', loanRequestId: newLoanRequestRef.id });
   } catch (error) {
-    console.error('Error during loan request processing:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during loan request processing');
   }
 });
 
-// Endpoint to process loan request status
+// Process loan request status
 router.put('/loan-status/:loanRequestId', authenticateUser, async (req, res) => {
   try {
     const { loanRequestId } = req.params;
     const { status, reason } = req.body;
 
-    if (!loanRequestId || !status) {
-      return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
-    }
+    validateLoanStatus(res, loanRequestId, status);
 
     const loanRequestsCollection = db.collection('LoanRequests');
     const loanRequestDoc = await loanRequestsCollection.doc(loanRequestId).get();
@@ -69,34 +66,25 @@ router.put('/loan-status/:loanRequestId', authenticateUser, async (req, res) => 
     }
 
     const updatedStatus = status.toLowerCase();
+    const updateData = { status: updatedStatus };
 
-    if (updatedStatus === 'accepted' || updatedStatus === 'rejected') {
-      const updateData = { status: updatedStatus };
-
-      if (reason !== undefined) {
-        updateData.reason = reason;
-      }
-
-      await loanRequestsCollection.doc(loanRequestId).update(updateData);
-
-      res.json({ loanRequestId, status: updatedStatus, reason });
-    } else {
-      res.status(400).json({ error: 'Bad Request', details: 'Invalid status provided' });
+    if (reason !== undefined) {
+      updateData.reason = reason;
     }
+
+    await loanRequestsCollection.doc(loanRequestId).update(updateData);
+
+    res.json({ loanRequestId, status: updatedStatus, reason });
   } catch (error) {
-    console.error('Error during loan request status update:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during loan request status update');
   }
 });
 
-// Endpoint to create an active loan
+// Create an active loan
 router.post('/active-loans', authenticateUser, async (req, res) => {
   try {
     const { loanRequestId, productId, loanDetails } = req.body;
-
-    if (!loanRequestId || !productId || !loanDetails) {
-      return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
-    }
+    validateActiveLoan(res, loanRequestId, productId, loanDetails);
 
     const activeLoansCollection = db.collection('ActiveLoans');
     const activeLoanData = {
@@ -109,12 +97,11 @@ router.post('/active-loans', authenticateUser, async (req, res) => {
 
     res.json({ message: 'Active loan created successfully', activeLoanId: newActiveLoanRef.id });
   } catch (error) {
-    console.error('Error during active loan creation:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during active loan creation');
   }
 });
 
-// Endpoint to get a list of loan requests
+// Get a list of loan requests
 router.get('/loan-requests', authenticateUser, async (req, res) => {
   try {
     const loanRequestsCollection = db.collection('LoanRequests');
@@ -127,19 +114,15 @@ router.get('/loan-requests', authenticateUser, async (req, res) => {
 
     res.json({ loanRequests });
   } catch (error) {
-    console.error('Error during loan requests retrieval:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during loan requests retrieval');
   }
 });
 
-// Endpoint to create a lending product (additional route)
+// Create a lending product
 router.post('/create-product', async (req, res) => {
   try {
     const { title, description, details, duration, amount, interest } = req.body;
-
-    if (!title || !description || !details || !duration || !amount || !interest) {
-      return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
-    }
+    validateProductCreation(res, title, description, details, duration, amount, interest);
 
     const lendingProductsCollection = db.collection('LendingProducts');
     const productData = {
@@ -155,30 +138,52 @@ router.post('/create-product', async (req, res) => {
 
     res.json({ message: 'Product created successfully', productId: newProductRef.id });
   } catch (error) {
-    console.error('Error during product creation:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during product creation');
   }
 });
 
-// Endpoint to get all lending products
+// Get all lending products
 router.get('/lending-products', async (req, res) => {
   try {
-    // Retrieve all lending products from the 'LendingProducts' collection
     const lendingProductsCollection = db.collection('LendingProducts');
     const snapshot = await lendingProductsCollection.get();
 
-    // Extract data from the snapshot
     const products = snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
 
     res.json({ message: 'Lending products retrieved successfully', products });
   } catch (error) {
-    console.error('Error during lending product retrieval:', error.message);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    handleError(res, error, 'Error during lending product retrieval');
   }
 });
 
+// Helper function to handle errors and send a consistent response
+const handleError = (res, error, message) => {
+  console.error(`${message}: ${error.message}`);
+  res.status(500).json({ error: 'Internal Server Error', details: error.message });
+};
+
+// Helper function to validate loan status
+const validateLoanStatus = (res, loanRequestId, status) => {
+  if (!loanRequestId || !status) {
+    res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+  }
+};
+
+// Helper function to validate active loan creation
+const validateActiveLoan = (res, loanRequestId, productId, loanDetails) => {
+  if (!loanRequestId || !productId || !loanDetails) {
+    res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+  }
+};
+
+// Helper function to validate product creation
+const validateProductCreation = (res, title, description, details, duration, amount, interest) => {
+  if (!title || !description || !details || !duration || !amount || !interest) {
+    res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+  }
+};
 
 module.exports = router;
