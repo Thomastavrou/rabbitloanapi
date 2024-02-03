@@ -8,18 +8,18 @@ module.exports = ({ db, auth }) => {
     // Endpoint to create a lending product
     router.post('/loan-request', async (req, res) => {
       try {
-        const { productId, amount } = req.body;
+        const { userId, productId, amount } = req.body;
     
         // Validate request body
-        if (!productId || !amount) {
+        if (!userId || !productId || !amount) {
           return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
         }
     
-        // Placeholder for user authentication logic (replace with your actual logic)
-        const userId = 'K9jm19pUFdMDnS16uArUxweqqd73'; // Replace with your actual user ID retrieval logic
+        // Ensure the user is authenticated (you might have a different authentication mechanism)
+        // This is just a basic check; replace it with your actual authentication logic
+        const isAuthenticated = /* Your authentication logic based on the provided userId */ true;
     
-        // Ensure the user is authenticated
-        if (!userId) {
+        if (!isAuthenticated) {
           return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
         }
     
