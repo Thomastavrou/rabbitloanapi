@@ -1,34 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-// Middleware for validating user authentication
-const authenticateUser = (req, res, next) => {
-  const isAuthenticated = /* Your authentication logic based on the provided userId */ true;
-
-  if (!isAuthenticated) {
-    return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
-  }
-
-  next();
-};
-
-// Middleware for checking existing loan request
-const checkExistingLoanRequest = async (req, res, next) => {
-  const { userId } = req.body;
-  const existingLoanRequest = await db.collection('LoanRequests')
-    .where('userId', '==', userId)
-    .limit(1)
-    .get();
-
-  if (!existingLoanRequest.empty) {
-    return res.status(400).json({ error: 'Bad Request', details: 'User already has a loan request' });
-  }
-
-  next();
-};
-
 // Create a loan request
-router.post('/loan-request', authenticateUser, checkExistingLoanRequest, async (req, res) => {
+router.post('/loan-request', async (req, res) => {
   try {
     const { userId, productId, amount } = req.body;
     const currentDate = new Date();
@@ -51,7 +25,7 @@ router.post('/loan-request', authenticateUser, checkExistingLoanRequest, async (
 });
 
 // Process loan request status
-router.put('/loan-status/:loanRequestId', authenticateUser, async (req, res) => {
+router.put('/loan-status/:loanRequestId', async (req, res) => {
   try {
     const { loanRequestId } = req.params;
     const { status, reason } = req.body;
@@ -81,7 +55,7 @@ router.put('/loan-status/:loanRequestId', authenticateUser, async (req, res) => 
 });
 
 // Create an active loan
-router.post('/active-loans', authenticateUser, async (req, res) => {
+router.post('/active-loans', async (req, res) => {
   try {
     const { loanRequestId, productId, loanDetails } = req.body;
     validateActiveLoan(res, loanRequestId, productId, loanDetails);
@@ -102,7 +76,7 @@ router.post('/active-loans', authenticateUser, async (req, res) => {
 });
 
 // Get a list of loan requests
-router.get('/loan-requests', authenticateUser, async (req, res) => {
+router.get('/loan-requests', async (req, res) => {
   try {
     const loanRequestsCollection = db.collection('LoanRequests');
     const snapshot = await loanRequestsCollection.get();
