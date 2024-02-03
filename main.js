@@ -51,8 +51,7 @@ app.use('/user', userRoutes({ db, auth, bucket }));
 app.use('/images', imageRoutes({ bucket }));
 app.use('/lending', lendingRoutes({ db, auth })); // Use the lendingRoutes for the /lending endpoint
 
-// Other routes
-// app.use('/openai', openaiRoutes);
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
