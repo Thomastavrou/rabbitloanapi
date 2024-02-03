@@ -86,7 +86,14 @@ router.put('/loan-status/:loanRequestId', async (req, res) => {
 
     if (updatedStatus === 'accepted' || updatedStatus === 'rejected') {
       // Update the status field
-      await loanRequestsCollection.doc(loanRequestId).update({ status: updatedStatus, reason });
+      const updateData = { status: updatedStatus };
+
+      // Include the reason field only if it's present in the request body
+      if (reason !== undefined) {
+        updateData.reason = reason;
+      }
+
+      await loanRequestsCollection.doc(loanRequestId).update(updateData);
 
       // Respond with the updated status
       res.json({ loanRequestId, status: updatedStatus, reason });
