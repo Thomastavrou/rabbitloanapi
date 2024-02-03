@@ -15,12 +15,21 @@ module.exports = ({ db, auth }) => {
           return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
         }
     
-        // Ensure the user is authenticated (you might have a different authentication mechanism)
-        // This is just a basic check; replace it with your actual authentication logic
+        // Ensure the user is authenticated (replace with your actual authentication logic)
         const isAuthenticated = /* Your authentication logic based on the provided userId */ true;
     
         if (!isAuthenticated) {
           return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
+        }
+    
+        // Check if the user already has a loan request
+        const existingLoanRequest = await db.collection('LoanRequests')
+          .where('userId', '==', userId)
+          .limit(1)
+          .get();
+    
+        if (!existingLoanRequest.empty) {
+          return res.status(400).json({ error: 'Bad Request', details: 'User already has a loan request' });
         }
     
         // Get the current date and time
