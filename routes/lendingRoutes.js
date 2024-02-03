@@ -117,21 +117,21 @@ router.post('/create-product', async (req, res) => {
 });
 
 // Get all lending products
-router.get('/lending-products', async (req, res) => {
-  try {
-    const lendingProductsCollection = db.collection('LendingProducts');
-    const snapshot = await lendingProductsCollection.get();
+// router.get('/lending-products', async (req, res) => {
+//   try {
+//     const lendingProductsCollection = db.collection('LendingProducts');
+//     const snapshot = await lendingProductsCollection.get();
 
-    const products = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+//     const products = snapshot.docs.map(doc => ({
+//       id: doc.id,
+//       ...doc.data(),
+//     }));
 
-    res.json({ message: 'Lending products retrieved successfully', products });
-  } catch (error) {
-    handleError(res, error, 'Error during lending product retrieval');
-  }
-});
+//     res.json({ message: 'Lending products retrieved successfully', products });
+//   } catch (error) {
+//     handleError(res, error, 'Error during lending product retrieval');
+//   }
+// });
 
 
 // Helper function to handle errors and send a consistent response
