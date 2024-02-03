@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes.js');
 const imageRoutes = require('./routes/imageRoute.js');
-const lendingRoutes = require('./routes/lendingRoutes.js');  
+const lendingRoutes = require('./routes/lendingRoutes.js');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -15,7 +15,6 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' })); // Set the payload size limit
-app.use(express.json());
 
 // Firebase Initialization
 try {
@@ -24,8 +23,6 @@ try {
       "type": "service_account",
       "project_id": process.env.FIREBASE_PROJECT_ID,
       "private_key_id": process.env.FIREBASE_PRIVATE_KEY_ID,
-      // "private_key": (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n').replace(/\\\\n/g, '\\n'),
-      // "private_key": (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
       "private_key": (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
       "client_email": process.env.FIREBASE_CLIENT_EMAIL,
       "client_id": process.env.FIREBASE_CLIENT_ID,
@@ -52,7 +49,7 @@ const bucket = admin.storage().bucket();
 // Pass the initialized services and the config object to userRoutes
 app.use('/user', userRoutes({ db, auth, bucket }));
 app.use('/images', imageRoutes({ bucket }));
-app.use('/lending', lendingRoutes({ db, auth }));  // Use the lendingRoutes for the /lending endpoint
+app.use('/lending', lendingRoutes({ db, auth })); // Use the lendingRoutes for the /lending endpoint
 
 // Other routes
 // app.use('/openai', openaiRoutes);
