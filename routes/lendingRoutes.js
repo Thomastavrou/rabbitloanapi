@@ -6,55 +6,58 @@ module.exports = ({ db, auth }) => {
     const router = express.Router();
   
     // Endpoint to create a lending product
-    router.post('/loan-request', async (req, res) => {
-      try {
-        const { userId, productId, amount } = req.body;
-    
-        // Validate request body
-        if (!userId || !productId || !amount) {
-          return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
-        }
-    
-        // Ensure the user is authenticated (replace with your actual authentication logic)
-        const isAuthenticated = /* Your authentication logic based on the provided userId */ true;
-    
-        if (!isAuthenticated) {
-          return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
-        }
-    
-        // Check if the user already has a loan request
-        const existingLoanRequest = await db.collection('LoanRequests')
-          .where('userId', '==', userId)
-          .limit(1)
-          .get();
-    
-        if (!existingLoanRequest.empty) {
-          return res.status(400).json({ error: 'Bad Request', details: 'User already has a loan request' });
-        }
-    
-        // Get the current date and time
-        const currentDate = new Date();
-    
-        // Your logic to handle the loan request goes here
-        // Store the loan request in a 'LoanRequests' collection
-        const loanRequestsCollection = db.collection('LoanRequests');
-    
-        const loanRequestData = {
-          userId,
-          productId,
-          amount,
-          date: currentDate,
-          // Additional fields if needed
-        };
-    
-        const newLoanRequestRef = await loanRequestsCollection.add(loanRequestData);
-    
-        res.json({ message: 'Loan request processed successfully', loanRequestId: newLoanRequestRef.id });
-      } catch (error) {
-        console.error('Error during loan request processing:', error.message);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
-      }
-    });
+router.post('/loan-request', async (req, res) => {
+  try {
+    const { userId, productId, amount } = req.body;
+
+    // Validate request body
+    if (!userId || !productId || !amount) {
+      return res.status(400).json({ error: 'Bad Request', details: 'Missing required fields' });
+    }
+
+    // Ensure the user is authenticated (replace with your actual authentication logic)
+    const isAuthenticated = /* Your authentication logic based on the provided userId */ true;
+
+    if (!isAuthenticated) {
+      return res.status(401).json({ error: 'Unauthorized', details: 'User not authenticated' });
+    }
+
+    // Check if the user already has a loan request
+    const existingLoanRequest = await db.collection('LoanRequests')
+      .where('userId', '==', userId)
+      .limit(1)
+      .get();
+
+    if (!existingLoanRequest.empty) {
+      return res.status(400).json({ error: 'Bad Request', details: 'User already has a loan request' });
+    }
+
+    // Get the current date and time
+    const currentDate = new Date();
+
+    // Your logic to handle the loan request goes here
+    // Store the loan request in a 'LoanRequests' collection
+    const loanRequestsCollection = db.collection('LoanRequests');
+
+    // Add the "status" field and set it to "pending"
+    const loanRequestData = {
+      userId,
+      productId,
+      amount,
+      date: currentDate,
+      status: 'pending',  // Add this line to set the status to "pending"
+      // Additional fields if needed
+    };
+
+    const newLoanRequestRef = await loanRequestsCollection.add(loanRequestData);
+
+    res.json({ message: 'Loan request processed successfully', loanRequestId: newLoanRequestRef.id });
+  } catch (error) {
+    console.error('Error during loan request processing:', error.message);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
     
   
     // Endpoint to create a lending product (additional route)
