@@ -5,8 +5,8 @@ module.exports = ({ db }) => {
   // Create a lending product
   router.post('/create-product', async (req, res) => {
     try {
-      const { title, description, details, duration, amount, interest } = req.body;
-
+      const { title, description, details, duration, amount, interest, order, show } = req.body;
+  
       const lendingProductsCollection = db.collection('LendingProducts');
       const productData = {
         title,
@@ -15,34 +15,38 @@ module.exports = ({ db }) => {
         duration,
         amount,
         interest,
+        order,  // New field: order
+        show,   // New field: show
       };
-
+  
       const newProductRef = await lendingProductsCollection.add(productData);
-
+  
       res.json({ message: 'Product created successfully', productId: newProductRef.id });
     } catch (error) {
       console.error('Error during product creation:', error.message);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
+  
 
   // Get all lending products
   router.get('/lending-products', async (req, res) => {
     try {
       const lendingProductsCollection = db.collection('LendingProducts');
-      const snapshot = await lendingProductsCollection.get();
-
+      const snapshot = await lendingProductsCollection.where('show', '==', true).orderBy('order').get();
+  
       const products = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-
+  
       res.json({ message: 'Lending products retrieved successfully', products });
     } catch (error) {
       console.error('Error during lending product retrieval:', error.message);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
+  
 
   // Create the loan Request
   router.post('/loan-request', async (req, res) => {
