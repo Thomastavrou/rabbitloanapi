@@ -88,21 +88,34 @@ module.exports = ({ db }) => {
     } catch (error) {
       handleErrors(res, error);
     }
-  });
+  }); 
 
   // Request verification
   router.post('/request-verification/:userId', async (req, res) => {
-    try {
-      const { userId } = req.params;
+  try {
+    const { userId } = req.params;
 
-      // Perform any necessary actions to initiate the verification process
-      // ...
+    // Perform any necessary actions to initiate the verification process
+    // ...
 
-      res.json({ message: 'Verification request sent successfully', status: 'pending' });
-    } catch (error) {
-      handleErrors(res, error);
-    }
-  });
+    // Create a document in the RequestedVerification collection
+    const verificationRequestRef = db.collection('RequestedVerification').doc();
+    const timestamp = new Date();
+
+    const verificationData = {
+      userId,
+      status: 'pending',
+      timestamp,
+      // Add any other relevant information you want to store for verification
+    };
+
+    await verificationRequestRef.set(verificationData);
+
+    res.json({ message: 'Verification request sent successfully', status: 'pending' });
+  } catch (error) {
+    handleErrors(res, error);
+  }
+});
 
   return router;
 };
