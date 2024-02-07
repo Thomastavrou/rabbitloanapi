@@ -12,7 +12,7 @@ module.exports = ({ db, auth, bucket }) => {
       // ...
 
       // Assume you have a 'Users' collection in your database
-      const usersCollection = db.collection('Users');
+      const usersCollection = db.collection('users');
       const userData = {
         name,
         surname,
