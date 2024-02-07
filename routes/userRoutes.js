@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const admin = require('firebase-admin');
 
 module.exports = ({ db, auth, bucket }) => {
   
@@ -8,29 +9,37 @@ module.exports = ({ db, auth, bucket }) => {
     try {
       const { name, surname, email, phone, password } = req.body;
 
-      // Implement registration logic, including validation, user creation, etc.
-      // ...
+      // Create user in Firebase Authentication
+      const userRecord = await admin.auth().createUser({
+        email: email,
+        password: password,
+        displayName: `${name} ${surname}`, // Optionally set display name
+      });
 
-      // Assume you have a 'Users' collection in your database
+      // Store additional user data in Firestore
       const usersCollection = db.collection('users');
       const userData = {
         name,
         surname,
         email,
         phone,
-        password,
         // Add other user-related data if needed
       };
 
-      const newUserRef = await usersCollection.add(userData);
+      await usersCollection.doc(userRecord.uid).set(userData);
 
-      res.json({ message: 'User registered successfully', userId: newUserRef.id });
+      res.status(201).json({ message: 'User registered successfully', userId: userRecord.uid });
     } catch (error) {
       console.error('Error during user registration:', error.message);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+
+      // Handle specific error cases
+      if (error.code === 'auth/email-already-exists') {
+        res.status(400).json({ error: 'Email already exists', details: error.message });
+      } else {
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+      }
     }
   });
 
-  
   return router;
 };
