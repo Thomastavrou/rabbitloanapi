@@ -1,53 +1,36 @@
-  const express = require('express');
-  const router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-  module.exports = ({ db, auth, bucket }) => {
-  // Create a lending product
-  router.post('/create-product', async (req, res) => {
+module.exports = ({ db, auth, bucket }) => {
+  
+  // Register a new user
+  router.post('/register', async (req, res) => {
     try {
-      const { title, description, details, duration, amount, interest } = req.body;
+      const { name, surname, email, phone, password } = req.body;
 
-      // Implement validation logic if needed
+      // Implement registration logic, including validation, user creation, etc.
       // ...
 
-      const lendingProductsCollection = db.collection('LendingProducts');
-      const productData = {
-        title,
-        description,
-        details,
-        duration,
-        amount,
-        interest,
+      // Assume you have a 'Users' collection in your database
+      const usersCollection = db.collection('Users');
+      const userData = {
+        name,
+        surname,
+        email,
+        phone,
+        password,
+        // Add other user-related data if needed
       };
 
-      const newProductRef = await lendingProductsCollection.add(productData);
+      const newUserRef = await usersCollection.add(userData);
 
-      res.json({ message: 'Product created successfully', productId: newProductRef.id });
+      res.json({ message: 'User registered successfully', userId: newUserRef.id });
     } catch (error) {
-      console.error('Error during product creation:', error.message);
+      console.error('Error during user registration:', error.message);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
 
-  // Get all lending products
-  router.get('/lending-products', async (req, res) => {
-    try {
-      const lendingProductsCollection = db.collection('LendingProducts');
-      const snapshot = await lendingProductsCollection.get();
-
-      const products = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      res.json({ message: 'Lending products retrieved successfully', products });
-    } catch (error) {
-      console.error('Error during lending product retrieval:', error.message);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
-  });
-
-  // Add other lending routes here
-
+  
   return router;
 };
