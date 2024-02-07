@@ -92,30 +92,37 @@ module.exports = ({ db }) => {
 
   // Request verification
   router.post('/request-verification/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
+    try {
+      const { userId } = req.params;
+  
+      // Check if a verification request already exists for the userId
+      const existingRequest = await db.collection('RequestedVerification').where('userId', '==', userId).get();
+  
+      if (!existingRequest.empty) {
+        // If a request already exists, handle it accordingly
+        return res.status(400).json({ error: 'Verification request already exists for this user' });
+      }
 
-    // Perform any necessary actions to initiate the verification process
-    // ...
-
-    // Create a document in the RequestedVerification collection
-    const verificationRequestRef = db.collection('RequestedVerification').doc();
-    const timestamp = new Date();
-
-    const verificationData = {
-      userId,
-      status: 'pending',
-      timestamp,
-      // Add any other relevant information you want to store for verification
-    };
-
-    await verificationRequestRef.set(verificationData);
-
-    res.json({ message: 'Verification request sent successfully', status: 'pending' });
-  } catch (error) {
-    handleErrors(res, error);
-  }
-});
-
-  return router;
+      // If no existing request, proceed to initiate the verification process
+      // ...
+      // Create a document in the RequestedVerification collection
+      const verificationRequestRef = db.collection('RequestedVerification').doc();
+      const timestamp = new Date();
+  
+      const verificationData = {
+        userId,
+        status: 'pending',
+        timestamp,
+        // Add any other relevant information you want to store for verification
+      };
+  
+      await verificationRequestRef.set(verificationData);
+  
+      res.json({ message: 'Verification request sent successfully', status: 'pending' });
+    } catch (error) {
+      handleErrors(res, error);
+    }
+  });
+  
+    return router;
 };
