@@ -61,6 +61,29 @@ module.exports = ({ db }) => {
     }
   });
 
+  // Get user information by user ID
+router.get('/get-user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Retrieve user data from Firestore
+    const userSnapshot = await db.collection('users').doc(userId).get();
+
+    if (!userSnapshot.exists) {
+      handleNotFound(res);
+      return;
+    }
+
+    // Extract user data from the snapshot
+    const userData = userSnapshot.data();
+
+    res.json({ message: 'User information retrieved successfully', userData });
+  } catch (error) {
+    handleErrors(res, error);
+  }
+});
+
+
   // Update user information
   router.patch('/update-user/:userId', async (req, res) => {
     try {
@@ -91,38 +114,38 @@ module.exports = ({ db }) => {
   }); 
 
   // Request verification
-  router.post('/request-verification/:userId', async (req, res) => {
-    try {
-      const { userId } = req.params;
-  
-      // Check if a verification request already exists for the userId
-      const existingRequest = await db.collection('RequestedVerification').where('userId', '==', userId).get();
-  
-      if (!existingRequest.empty) {
-        // If a request already exists, handle it accordingly
-        return res.status(400).json({ error: 'Verification request already exists for this user' });
-      }
+    router.post('/request-verification/:userId', async (req, res) => {
+      try {
+        const { userId } = req.params;
+    
+        // Check if a verification request already exists for the userId
+        const existingRequest = await db.collection('RequestedVerification').where('userId', '==', userId).get();
+    
+        if (!existingRequest.empty) {
+          // If a request already exists, handle it accordingly
+          return res.status(400).json({ error: 'Verification request already exists for this user' });
+        }
 
-      // If no existing request, proceed to initiate the verification process
-      // ...
-      // Create a document in the RequestedVerification collection
-      const verificationRequestRef = db.collection('RequestedVerification').doc();
-      const timestamp = new Date();
-  
-      const verificationData = {
-        userId,
-        status: 'pending',
-        timestamp,
-        // Add any other relevant information you want to store for verification
-      };
-  
-      await verificationRequestRef.set(verificationData);
-  
-      res.json({ message: 'Verification request sent successfully', status: 'pending' });
-    } catch (error) {
-      handleErrors(res, error);
-    }
+        // If no existing request, proceed to initiate the verification process
+        // ...
+        // Create a document in the RequestedVerification collection
+        const verificationRequestRef = db.collection('RequestedVerification').doc();
+        const timestamp = new Date();
+    
+        const verificationData = {
+          userId,
+          status: 'pending',
+          timestamp,
+          // Add any other relevant information you want to store for verification
+        };
+    
+        await verificationRequestRef.set(verificationData);
+    
+        res.json({ message: 'Verification request sent successfully', status: 'pending' });
+      } catch (error) {
+        handleErrors(res, error);
+      }
   });
-  
+
     return router;
 };

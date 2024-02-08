@@ -47,7 +47,7 @@ module.exports = ({ bucket }) => {
       }
   
       // Decode base64 image to buffer
-      const imageBuffer = Buffer.from(imageBase64, 'base64');
+        const imageBuffer = Buffer.from(imageBase64, 'base64');
   
       // Specify the user folder using the userId
       const userFolder = `${userId}`;
@@ -62,10 +62,6 @@ module.exports = ({ bucket }) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
-  
-  
-  
-
 
   return router;
 };
