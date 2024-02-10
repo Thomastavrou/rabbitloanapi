@@ -8,8 +8,25 @@ module.exports = ({ bucket }) => {
   const upload = multer({
     storage: multer.memoryStorage(),
   });
-  
 
+  // Helper function to get content type based on file extension
+  const getContentTypeFromFilename = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+
+    switch (ext) {
+      case 'jpeg':
+      case 'jpg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'pdf':
+        return 'application/pdf';
+      default:
+        return null; // Unknown content type
+    }
+  };
+
+  // Endpoint to get an image
   router.get('/get-image/:folder/:filename', async (req, res) => {
     try {
       const { folder, filename } = req.params;
@@ -37,6 +54,11 @@ module.exports = ({ bucket }) => {
         res.setHeader('Content-Type', contentType);
       }
 
+      // Headers for debugging
+      res.setHeader('Debug-Endpoint', 'get-image');
+      res.setHeader('Debug-Folder', folder);
+      res.setHeader('Debug-Filename', filename);
+
       // Pipe the file stream to the response object
       fileStream.pipe(res);
     } catch (error) {
@@ -45,8 +67,10 @@ module.exports = ({ bucket }) => {
     }
   });
 
+  // Endpoint to upload an image
   router.post('/upload-image', upload.single('image'), async (req, res) => {
     try {
+      // Extracting userId and name from the request body
       const { userId, name } = req.body;
 
       // Input validation
@@ -54,6 +78,7 @@ module.exports = ({ bucket }) => {
         return res.status(400).json({ error: 'User ID, image data, and name are required' });
       }
 
+      // Get the image buffer from the uploaded file
       const imageBuffer = req.file.buffer;
 
       // Specify the user folder using the userId
@@ -61,7 +86,12 @@ module.exports = ({ bucket }) => {
 
       // Upload the image to Firebase Storage within the user folder with the specified name
       const file = bucket.file(`${userFolder}/${name}`);
-      await file.save(imageBuffer, { contentType: 'image/jpeg' });
+      await file.save(imageBuffer, { contentType: getContentTypeFromFilename(name) });
+
+      // Headers for debugging
+      res.setHeader('Debug-Endpoint', 'upload-image');
+      res.setHeader('Debug-UserId', userId);
+      res.setHeader('Debug-Name', name);
 
       res.json({ message: 'Image uploaded successfully', imageUrl: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/${userFolder}/${name}` });
     } catch (error) {
