@@ -43,19 +43,17 @@ module.exports = ({ bucket }) => {
     // Example: return 'image/jpeg' for JPEG images, 'image/png' for PNG, etc.
   }
   
-  
    
   router.post('/upload-image', async (req, res) => {
     try {
-      const { userId, imageBase64, name } = req.body;
+      const { userId, name } = req.body;
   
       // Input validation
-      if (!userId || !imageBase64 || !name) {
+      if (!userId || !req.files || !req.files.image || !name) {
         return res.status(400).json({ error: 'User ID, image data, and name are required' });
       }
   
-      // Decode base64 image to buffer
-        const imageBuffer = Buffer.from(imageBase64, 'base64');
+      const imageBuffer = req.files.image.data;
   
       // Specify the user folder using the userId
       const userFolder = `${userId}`;
@@ -70,6 +68,7 @@ module.exports = ({ bucket }) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
+  
 
   return router;
 };
