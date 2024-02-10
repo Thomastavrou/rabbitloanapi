@@ -51,28 +51,28 @@ module.exports = ({ bucket }) => {
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
       }
-
+  
       const userId = req.body.userId;
       const name = req.body.name;
-
+  
       if (!userId || !name) {
         return res.status(400).json({ error: 'User ID and name are required' });
       }
-
+  
       const userFolder = `${userId}`;
       const fileUpload = bucket.file(`${userFolder}/${name}`);
-
-      // Pipe the file buffer to the Firebase Storage bucket
-      req.file.buffer.pipe(fileUpload.createWriteStream({ contentType: req.file.mimetype }));
-
+  
+      // Write the buffer to the Firebase Storage bucket
+      await fileUpload.save(req.file.buffer, { contentType: req.file.mimetype });
+  
       // Headers for debugging
       res.setHeader('Debug-Endpoint', 'upload-image');
       res.setHeader('Debug-UserId', userId);
       res.setHeader('Debug-Name', name);
-
+  
       // Log headers
       console.log('Headers:', req.headers);
-
+  
       res.json({
         message: 'Image uploaded successfully',
         imageUrl: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/${userFolder}/${name}`
@@ -83,6 +83,5 @@ module.exports = ({ bucket }) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
-
   return router;
 };
