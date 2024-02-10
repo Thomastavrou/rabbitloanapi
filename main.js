@@ -55,10 +55,11 @@
     // app.use('/profile', userProfileRoutes({db,auth,bucket})); // Use the profile route to collect user information. 
     // Global Error Handler
 
-    app.use((err, req, res, next) => {
-      console.error(err.stack);
-      res.status(500).send('Something went wrong!');
-    });
+    // Add this middleware after your routes
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message });
+});
 
     // Start Server
     app.listen(port, () => {
