@@ -24,8 +24,11 @@ module.exports = ({ bucket }) => {
       // Get a readable stream of the file from Firebase Storage
       const fileStream = file.createReadStream();
   
-      // Set the response headers
-      res.setHeader('Content-Type', 'image/jpeg'); // Set the appropriate content type
+      // Determine Content-Type based on file extension or type
+      const contentType = getContentTypeFromFilename(filename);
+      if (contentType) {
+        res.setHeader('Content-Type', contentType);
+      }
   
       // Pipe the file stream to the response object
       fileStream.pipe(res);
@@ -34,6 +37,11 @@ module.exports = ({ bucket }) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   });
+  
+  function getContentTypeFromFilename(filename) {
+    // Add logic to determine Content-Type based on the filename or file type
+    // Example: return 'image/jpeg' for JPEG images, 'image/png' for PNG, etc.
+  }
   
   
    

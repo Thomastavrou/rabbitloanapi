@@ -3,35 +3,184 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('bg.jpeg'); /* Replace with your background image URL */
+      background-size: cover;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative; /* Make sure to set position relative for the pseudo-element to work */
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); /* Dark overlay color */
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+      width: 100%;
+      margin:10px;
+      z-index: 1; /* Ensure the card container is above the overlay */
+    }
+
+    .glass-card {
+      margin:10px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgb(255 255 255 / 15%);
+      backdrop-filter: blur(25.5px);
+      -webkit-backdrop-filter: blur(18.5px);
+      border-radius: 10px;
+      border: 1px solid rgb(255 255 255 / 8%);
+      overflow: hidden;
+      width: 15%;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease-in-out;
+      padding: 5%;
+    }
+
+    .glass-card:hover {
+      transform: scale(1.05);
+    }
+
+    /* .glass-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    } */
+
+    .glass-card-content {
+      padding: 15px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .glass-card-title {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      color: #fff; /* White text for better contrast */
+    }
+
+    .glass-card-description {
+      font-size: 0.9rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .glass-card-sector {
+      font-size: 0.8rem;
+      color: #fff;
+    }
+
+    /* Footer styles */
+    .card-footer {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .expand-arrow {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 5px 0 5px 8px;
+      border-color: transparent transparent transparent #555;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .expanded .expand-arrow {
+      transform: rotate(90deg);
+    }
+
+    .dropdown-content {
+      display: none;
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out;
+    }
+
+    .expanded .dropdown-content {
+      display: block;
+      max-height: 200px; /* Set a max height or adjust as needed */
+    }
+  </style>
 </head>
 <body>
 
-<img id="imageDisplay" alt="Fetched Image">
+  <div class="card-container">
+    <div class="glass-card">
+      <img src="https://www.zaapyapp.com/images/logo_with_name_dark.png" alt="Card Image">
+      <div class="glass-card-content">
+        <h2 class="glass-card-title">Svelta</h2>
+        <p class="glass-card-description">Small description about Svelta.</p>
+        <p class="glass-card-sector">Sector: Finance</p>
+      </div>
+      <!-- Footer with expand arrow and dropdown content -->
+      
+    </div>
+    <div class="glass-card">
+      <img src="https://www.zaapyapp.com/images/logo_with_name_dark.png" alt="Card Image">
+      <div class="glass-card-content">
+        <h2 class="glass-card-title">Svelta</h2>
+        <p class="glass-card-description">Small description about Svelta.</p>
+        <p class="glass-card-sector">Sector: Finance</p>
+      </div>
+      <!-- Footer with expand arrow and dropdown content -->
+      
+    </div>
+    <div class="glass-card">
+      <img src="https://www.zaapyapp.com/images/logo_with_name_dark.png" alt="Card Image">
+      <div class="glass-card-content">
+        <h2 class="glass-card-title">Svelta</h2>
+        <p class="glass-card-description">Small description about Svelta.</p>
+        <p class="glass-card-sector">Sector: Finance</p>
+      </div>
+      <!-- Footer with expand arrow and dropdown content -->
+      
+    </div>
+    <div class="glass-card">
+      <img src="https://www.zaapyapp.com/images/logo_with_name_dark.png" alt="Card Image">
+      <div class="glass-card-content">
+        <h2 class="glass-card-title">Svelta</h2>
+        <p class="glass-card-description">Small description about Svelta.</p>
+        <p class="glass-card-sector">Sector: Finance</p>
+      </div>
+      <!-- Footer with expand arrow and dropdown content -->
+      
+    </div>
+    <!-- Add more cards as needed -->
 
-<script>
-  const apiUrl = 'https://rabbitloan-service.onrender.com/images/get-image/1706721607526_26509.jpeg';
+  </div>
 
-  fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.blob();
-    })
-    .then(blob => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Log the base64-encoded image data
-        console.log('Base64-encoded image data:', reader.result);
-
-        // Set the base64-encoded image data as the source of the image element
-        document.getElementById('imageDisplay').src = reader.result;
-      };
-      reader.readAsDataURL(blob);
-    })
-    .catch(error => console.error('Error fetching image:', error));
-</script>
+  <script>
+    function toggleDropdown(element) {
+      const card = element.closest('.glass-card');
+      card.classList.toggle('expanded');
+    }
+  </script>
 
 </body>
 </html>
