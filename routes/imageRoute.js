@@ -5,7 +5,10 @@ module.exports = ({ bucket }) => {
   const router = express.Router();
 
   // Configure multer for handling file uploads
-  const upload = multer();
+  const upload = multer({
+    storage: multer.memoryStorage(),
+  });
+  
 
   router.get('/get-image/:folder/:filename', async (req, res) => {
     try {
