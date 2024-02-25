@@ -5,7 +5,8 @@
     const userRoutes = require('./routes/userRoutes.js');
     const imageRoutes = require('./routes/imageRoute.js');
     const lendingRoutes = require('./routes/lendingRoutes.js');
-   
+    const sumsubRoutes = require('./routes/sumsubRoutes.js');
+
     // const userProfileRoutes =require('./routes/userProfileRoutes.js');
     // Load environment variables from .env file
     require('dotenv').config();
@@ -52,6 +53,8 @@
     app.use('/user', userRoutes({ db, auth, bucket }));
     app.use('/images', imageRoutes({ bucket }));
     app.use('/lending', lendingRoutes({ db, auth })); // Use the lendingRoutes for the /lending endpoint
+    app.use('/sumsub', sumsubRoutes());
+
     // app.use('/profile', userProfileRoutes({db,auth,bucket})); // Use the profile route to collect user information. 
     // Global Error Handler
 
